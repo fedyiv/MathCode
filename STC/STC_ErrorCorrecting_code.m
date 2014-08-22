@@ -55,6 +55,7 @@ w0 = 0;
 w1 = 0;
 path = uint8(inf*ones(2^h,w*num));
 
+%Forward part
 sh=2^h-1;
 for i = 1:num
     shift=uint32(0);
@@ -89,17 +90,20 @@ for i = 1:num
         indx = indx +1;
         wght = newwght;
     end
+    %End of w-block. Shifting partial syndrome
     for j = 1:1:(2^(h-1))
         wght(j) = wght(j + j -1 + m(indm));
+        %This is code correcting feature starts
+        if(mod(sum(dec2bin(j-1)=='1',2),2))
+            wght(j)=inf;
+        end
+        %Code correction feature ends
     end
     wght(2^(h-1)+1:end) = inf;
     indm = indm + 1;
 end
 
-%sum(path(~isinf(path)))
-%sum(path(isinf(path)))
-%sum(path(path==0))
-
+%Backward part
 y = x;
 cost = wght(1);
 state = 0;
