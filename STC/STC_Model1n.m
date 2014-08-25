@@ -1,6 +1,6 @@
-function [  ] = STC_Model1w( n,w,h,weightsModel )
+function [  ] = STC_Model1n( n,w,h,weightsModel,correctingWay )
 %Function to compare cost of embedding for non error correcting STC and
-%error correcring STC with respect to 'w'
+%error correcring STC with respect to 'n'
 %IMPORTANT if w << h then not enough paths will be to choose from by the
 %end of w-block; 
 
@@ -25,7 +25,13 @@ for i=1:numel(n)
     [h_hat, ~]=STC_Gen_Rnd_h_hat(h,w);
     %Perform Coding in two ways
     [y1, CostsWithoutCorrection(i), ~, ~] = STC_cod3(x, m, h_hat, rho);
-    [y2, CostsWithCorrection(i), ~, ~] = STC_ErrorCorrecting_code(x, m, h_hat, rho);
+    if(correctingWay==1)
+        [y2, CostsWithCorrection(i), ~, ~] = STC_ErrorCorrecting_code(x, m, h_hat, rho);
+    elseif(correctingWay==2)
+        [y2, CostsWithCorrection(i), ~, ~] = STC_ErrorCorrecting_codeV2(x, m, h_hat, rho);
+    else
+        assert(0);
+    end
     CostsReplacing(i) = getCostsofBitsReplacing(x, numel(m)/numel(x), rho);
     %Perform decoding
     m1=STC_decod(y1,h_hat,floor(n(i)/w));

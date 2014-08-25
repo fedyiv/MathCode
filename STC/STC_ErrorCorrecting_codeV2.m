@@ -1,4 +1,4 @@
-function [y, cost, alpha, s] = STC_ErrorCorrecting_code(x, m, h_hat, rho)
+function [y, cost, alpha, s] = STC_ErrorCorrecting_codeV2(x, m, h_hat, rho)
 % вычисления в данной программе происходят только при n == n1, n > n1.
 %To be completely rewritten to be able to code with error correcting
 %capabilities. For this only small change is necessary - when selecting
@@ -91,15 +91,16 @@ for i = 1:num
         wght = newwght;
     end
     %End of w-block. Shifting partial syndrome
-    for j = 1:1:(2^(h-1))
-        wght(j) = wght(j + j -1 + m(indm));
-        %This is code correcting feature starts (This version excludes half
-        %of the nodes in the beginning of the next block) See v2 for better
-        %behaviour.
-        if(mod(sum(dec2bin(j-1)=='1',2),2))
+    
+    %Code correcting feature starts here
+    for j = 1:1:(2^(h))
+         if(mod(sum(dec2bin(j-1)=='1',2),2))
             wght(j)=inf;
         end
-        %Code correction feature ends
+    end
+    %Code correction feature ends
+    for j = 1:1:(2^(h-1))
+        wght(j) = wght(j + j -1 + m(indm));       
     end
     wght(2^(h-1)+1:end) = inf;
     indm = indm + 1;
