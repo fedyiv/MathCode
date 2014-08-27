@@ -26,7 +26,7 @@ for state=0:nStates-1
     stateBits=flipud((dec2bin(state,h)=='1')');
     for outputBits=0:2^w-1      
         Y=flipud((dec2bin(outputBits,w)=='1')');
-        nextStateBits=mod(h_hat*Y+stateBits,2);
+        nextStateBits=mod(double(h_hat)*double(Y)+stateBits,2);
         inputBit=nextStateBits(1);
          %add shift here
         nextState=uint32(floor(binvec2dec(nextStateBits')/2));
