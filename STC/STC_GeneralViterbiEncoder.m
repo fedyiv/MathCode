@@ -25,7 +25,9 @@ inputBitsPath=inf*ones(numStates,floor(n/blockSize));
 disp('Starting forward part');
 %Loop by columns of the trellis i.e. by blocck of bits of the message
 for i=1:floor(n/blockSize)
-    disp(['Forward part: block ' num2str(i) ' from ' num2str(floor(n/blockSize)) ]);
+    if(mod(i,10)==0)
+        disp(['Forward part: block ' num2str(i) ' from ' num2str(floor(n/blockSize)) ]);
+    end
     X=x(1+blockSize*(i-1):blockSize*i);
     RHO=rho(1+blockSize*(i-1):blockSize*i);
     
