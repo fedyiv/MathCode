@@ -22,7 +22,7 @@ function varargout = SimpleLSB_demo(varargin)
 
 % Edit the above text to modify the response to help SimpleLSB_demo
 
-% Last Modified by GUIDE v2.5 23-Oct-2014 10:52:57
+% Last Modified by GUIDE v2.5 28-Oct-2014 10:08:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -94,7 +94,27 @@ function perfromEmbedding_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.sgImage=handles.originalImage+uint8(round(rand(size(handles.originalImage))));
+pEmb=1;
+
+%[messageFilename,messagePath]=uigetfile({'*.txt';'*.*'},'Select file with message to embedd');
+messageFilename='pass.txt';
+messagePath='D:\work\';
+
+messageFileInfo = dir([messagePath messageFilename]);
+messageFileSize = 8*messageFileInfo.bytes;
+
+capacity=floor(pEmb*numel(handles.originalImage)/3);
+
+if(messageFileSize > capacity)
+    msgbox(['CM capacity='  num2str(capacity) ' bits message file size = ' num2str(messageFileSize) ' bits'],'Impossible to emedd selected file');
+    return;
+end
+
+b=getFileBits([messagePath messageFilename]);
+
+%handles.sgImage=handles.originalImage+uint8(round(rand(size(handles.originalImage))));
+%handles.sgImage=eurModel3emulateLSBreplacingSingleImage(pEmb,handles.originalImage);
+handles.sgImage=eurModel3LSBreplacingSingleImageEmbedding(pEmb,b,handles.originalImage);
 
 imshow(handles.sgImage,'Parent',handles.sgImageAxes);
 
@@ -111,6 +131,74 @@ handles.sgImageVisualAttack=255*mod(handles.sgImage,2);
 
 imshow(handles.originalImageVisualAttack,'Parent',handles.originalImageVisualAttackAxes);
 imshow(handles.sgImageVisualAttack,'Parent',handles.sgImageVisualAttackAxes);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+function [bitArray] = getFileBits(filename)
+
+fileID = fopen(filename);
+A = uint8(fread(fileID));
+fclose(fileID);
+A(numel(A)+1:numel(A)+3)=[123;241;142]; % Signal of the EOF
+
+
+bits=de2bi(A,8);
+bitArray=reshape(bits',1,[]);
+
+function [message] = getAndSaveMessageFromBits(bitArray,filename)
+
+preBinaryMessage=reshape(bitArray,8,[]);
+binaryMessage=preBinaryMessage';
+
+message=bi2de(binaryMessage);
+
+for i=1:numel(message)-2
+    if(message(i)==123 && message(i+1)==241 && message(i+2)==142 )
+        message=message(1:i-1);
+        break;
+    end
+    if(i==numel(message)-2)
+        error('Broken file. Can not extract message.')
+    end
+end
+
+fileID=fopen(filename,'w')
+fwrite(fileID,message);
+fclose(fileID);
+
+
+
+% --- Executes on button press in ExtractButton.
+function ExtractButton_Callback(hObject, eventdata, handles)
+% hObject    handle to ExtractButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+pEmb=1;
+
+%[extractedMessageFilename,extractedMessagePath]=uigetfile({'*.txt';'*.*'},'Select file where to extract message');
+extractedMessageFilename='passExtracted.txt';
+extractedMessagePath='D:\work\';
+
+messageBits=eurModel3LSBreplacingSingleImageExtracting(pEmb,handles.sgImage);
+messsage=getAndSaveMessageFromBits(messageBits,[extractedMessagePath extractedMessageFilename]);
+
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes on button press in openStegoImageButton.
+function openStegoImageButton_Callback(hObject, eventdata, handles)
+% hObject    handle to openStegoImageButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%[stegoImagePath,stegoImageFilename]=uigetfile({'*.bmp';'*.pgm';'*.*'},'File Selector');
+stegoImagePath='D:\work\';
+stegoImageFilename='sg_1.pgm';
+handles.sgImage=imread([stegoImagePath stegoImageFilename]);
+imshow(handles.sgImage,'Parent',handles.sgImageAxes);
 
 % Update handles structure
 guidata(hObject, handles);
