@@ -22,7 +22,7 @@ function varargout = SimpleLSB_demo(varargin)
 
 % Edit the above text to modify the response to help SimpleLSB_demo
 
-% Last Modified by GUIDE v2.5 28-Oct-2014 10:08:07
+% Last Modified by GUIDE v2.5 04-Nov-2014 14:27:12
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,6 +54,7 @@ function SimpleLSB_demo_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for SimpleLSB_demo
 handles.output = hObject;
+handles.attackThresholdSP=0.004;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -78,9 +79,13 @@ function openImageButton_Callback(hObject, eventdata, handles)
 % hObject    handle to openImageButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-%[originalImageFilename,originalImagePath]=uigetfile({'*.bmp';'*.pgm';'*.*'},'File Selector');
-originalImagePath='D:\work\BOSSdb1.0\';
-originalImageFilename='1.pgm';
+[originalImageFilename,originalImagePath]=uigetfile({'*.bmp';'*.pgm';'*.*'},'File Selector');
+[~,originalImageName,originalImageExt]=fileparts(originalImageFilename);
+handles.originalImageName=originalImageName;
+handles.originalImageExt=originalImageExt;
+handles.originalImagePath=originalImagePath;
+%originalImagePath='D:\work\BOSSdb1.0\';
+%originalImageFilename='2.pgm';
 handles.originalImage=imread([originalImagePath originalImageFilename]);
 imshow(handles.originalImage,'Parent',handles.originalImageAxes);
 
@@ -96,9 +101,14 @@ function perfromEmbedding_Callback(hObject, eventdata, handles)
 
 pEmb=1;
 
-%[messageFilename,messagePath]=uigetfile({'*.txt';'*.*'},'Select file with message to embedd');
-messageFilename='pass.txt';
-messagePath='D:\work\';
+[messageFilename,messagePath]=uigetfile({'*.htm';'*.txt';'*.*'},'Select file with message to embedd');
+%messageFilename='pass.txt';
+%messagePath='D:\work\';
+
+%[stegoImageFilename,stegoImagePath]=uiputfile({'*.bmp';'*.pgm';'*.*'},'File Selector',[handles.originalImagePath handles.originalImageName '_SG.bmp' ]);
+stegoImagePath=handles.originalImagePath;
+stegoImageFilename=[handles.originalImageName '_SG.bmp' ];
+
 
 messageFileInfo = dir([messagePath messageFilename]);
 messageFileSize = 8*messageFileInfo.bytes;
@@ -112,11 +122,10 @@ end
 
 b=getFileBits([messagePath messageFilename]);
 
-%handles.sgImage=handles.originalImage+uint8(round(rand(size(handles.originalImage))));
-%handles.sgImage=eurModel3emulateLSBreplacingSingleImage(pEmb,handles.originalImage);
 handles.sgImage=eurModel3LSBreplacingSingleImageEmbedding(pEmb,b,handles.originalImage);
 
 imshow(handles.sgImage,'Parent',handles.sgImageAxes);
+imwrite(handles.sgImage,[stegoImagePath stegoImageFilename],'bmp');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -194,11 +203,43 @@ function openStegoImageButton_Callback(hObject, eventdata, handles)
 % hObject    handle to openStegoImageButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-%[stegoImagePath,stegoImageFilename]=uigetfile({'*.bmp';'*.pgm';'*.*'},'File Selector');
-stegoImagePath='D:\work\';
-stegoImageFilename='sg_1.pgm';
+[stegoImageFilename,stegoImagePath]=uigetfile({'*.bmp';'*.pgm';'*.*'},'File Selector');
+%stegoImagePath='D:\work\';
+%stegoImageFilename='sg_1.pgm';
+handles.stegoImagePath=stegoImagePath;
+handles.stegoImageFilename=stegoImageFilename;
 handles.sgImage=imread([stegoImagePath stegoImageFilename]);
 imshow(handles.sgImage,'Parent',handles.sgImageAxes);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes on button press in AttackButton.
+function AttackButton_Callback(hObject, eventdata, handles)
+% hObject    handle to AttackButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.attackThresholdSP = str2num(cell2mat(inputdlg('Threshold','Enter threshold',1,{num2str(handles.attackThresholdSP)})));
+
+cmAttackValue=borrowedFridrichSP(handles.originalImage);
+set(handles.hi2CMValueText,'String',cmAttackValue);
+
+sgAttackValue=borrowedFridrichSP(handles.sgImage);
+set(handles.hi2SGValueText,'String',sgAttackValue);
+
+if(cmAttackValue>handles.attackThresholdSP)
+    set(handles.hi2CMStatus,'String','Embedding Detected!!');
+else
+    set(handles.hi2CMStatus,'String','Not Detected.');
+end
+
+if(sgAttackValue>handles.attackThresholdSP)
+    set(handles.hi2SGStatus,'String','Embedding Detected!!');
+else
+    set(handles.hi2SGStatus,'String','Not Detected.');
+end
+
 
 % Update handles structure
 guidata(hObject, handles);
