@@ -186,9 +186,9 @@ function ExtractButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 pEmb=1;
 
-%[extractedMessageFilename,extractedMessagePath]=uigetfile({'*.txt';'*.*'},'Select file where to extract message');
-extractedMessageFilename='passExtracted.txt';
-extractedMessagePath='D:\work\';
+[extractedMessageFilename,extractedMessagePath]=uiputfile({'*.txt';'*.*'},'Select file where to extract message');
+%extractedMessageFilename='passExtracted.txt';
+%extractedMessagePath='D:\work\';
 
 messageBits=eurModel3LSBreplacingSingleImageExtracting(pEmb,handles.sgImage);
 messsage=getAndSaveMessageFromBits(messageBits,[extractedMessagePath extractedMessageFilename]);
