@@ -1,6 +1,6 @@
 function [  ] = split_images(directorySource,directorySG,ext,L)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%Splitting each image in the folder directorySource to blocks , by dividing
+%height and withd by L
 list=eurModel3getFiles(directorySource,ext);
 
 N=numel(list);

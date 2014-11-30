@@ -10,7 +10,9 @@ N=numel(list);
 
 for i=1:N
 
-    disp(['Image ' list{i} ' is being processed'])
+    if(mod(i,100)==0)
+        disp(['Image ' list{i} ' is being processed']);
+    end
     im=imread(list{i});
     im1=im;
     

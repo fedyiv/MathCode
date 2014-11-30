@@ -1,6 +1,6 @@
 function [  ] = split_images2(sourceImage,directorySG,ext,blkLen)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%Splitting one big image in the folder directorySource to blocks of size
+%blkLen x blkLen
 im=imread(sourceImage);
     
 [m,n]=size(im);
