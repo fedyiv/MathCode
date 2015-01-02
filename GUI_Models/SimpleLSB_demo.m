@@ -1,3 +1,4 @@
+%#function imshow,display,format,imread
 function varargout = SimpleLSB_demo(varargin)
 % SIMPLELSB_DEMO MATLAB code for SimpleLSB_demo.fig
 %      SIMPLELSB_DEMO, by itself, creates a new SIMPLELSB_DEMO or raises the existing
