@@ -9,7 +9,7 @@ n = size(x,2);
 
 %file='d:\test.stc';
 threadId=num2str(round(1000000*rand));
-file=['c:\tmp\tempbuf-' threadId '.stc'];
+file=['d:\tmp\tempbuf-' threadId '.stc'];
 
 if (size(rho,2) ~= n)
     s = 'length of rho and x must be equal';
