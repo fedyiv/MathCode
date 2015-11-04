@@ -1,6 +1,7 @@
 package com.fedyiv;
 
 import java.io.FileInputStream;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Random;
@@ -13,7 +14,7 @@ public class Main {
        // double [] x = new double[]{1,2,3,4,5,6,7,8,9,10};
         //double [] y = new double[]{1,2,100,4,5,6,7,8,9,10};
 
-        int N=1000;
+        int N=100000;
         int base=16;
 
         int[] plainMessage;
@@ -23,13 +24,46 @@ public class Main {
         int[] encryptedMessage;
         int[] encryptedMessage2;
 
+        double []x1,y1;
+        BigInteger[] x2,y2;
+
+
+
+        SequenceHelperBig sequenceHelperBig = new SequenceHelperBig();
+        SequenceHelper sequenceHelper = new SequenceHelper();
+        SequenceSaver  sequenceSaver = new SequenceSaver();
+
+
+
         SimpleCipher simpleCipher = new SimpleCipher();
 
         secretKey=simpleCipher.generateSecretKey();
         plainMessage=simpleCipher.generateRandomBitArray(base * N);
         plainMessage2=simpleCipher.generateRandomBitArray(base * N);
 
+        x1=sequenceSaver.convertBinarySequenceToDecimal(plainMessage, base);
+        x2=sequenceHelperBig.convertBinarySequenceToDecimal(plainMessage, base);
 
+        y1=sequenceSaver.convertBinarySequenceToDecimal(plainMessage2, base);
+        y2=sequenceHelperBig.convertBinarySequenceToDecimal(plainMessage2,base);
+
+
+        for(int i=0;i<x1.length;i++)
+        {
+            if(x1[i]!=x2[i].doubleValue())
+            {
+                System.out.println("ERROR: Wrong value");
+            }
+        }
+        System.out.println("All values are matching!!!");
+        if(sequenceHelper.calculateCorrelation(x1, y1)!=(sequenceHelperBig.calculateCorrelation(x2, y2)).doubleValue())
+        {
+            System.out.println("ERROR: Wrong correlation expectation: normal correlation expectation=" + sequenceHelper.calculateCorrelation(x1, y1) + "Big correlation = " +  (sequenceHelperBig.calculateCorrelation(x2, y2)).doubleValue());
+        }
+
+
+
+/*
         simpleCipher.setSecretKey(secretKey);
 
         encryptedMessage=simpleCipher.encrypt(plainMessage);
@@ -54,7 +88,7 @@ public class Main {
 
 
 
-        SequenceSaver sequenceSaver = new SequenceSaver();
+
 
 
 

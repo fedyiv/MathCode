@@ -3,6 +3,7 @@ package com.fedyiv;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Random;
 
 /**
@@ -56,6 +57,8 @@ public class SequenceSaver {
         }
         return decimalSequence;
     }
+
+
     public void saveBinarySequenceAsDecimal(int [] binarySequence,int base,String fileName)
     {
         saveDecimalSequence(convertBinarySequenceToDecimal(binarySequence,base),fileName);

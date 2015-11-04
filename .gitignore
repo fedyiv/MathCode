@@ -1,2 +1,5 @@
 #matlab autosave
 *.asv
+*.class
+*.class
+MutualInformation/out/production/MutualInformation/com/fedyiv/Main.class
